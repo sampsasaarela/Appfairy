@@ -235,8 +235,10 @@ class ViewWriter extends Writer {
       el.tagName += `-af-sock-${socketName}`
     })
 
+    $("img[alt='']").removeAttr("alt");
+
     // Refetch modified html
-    html = $body.html()
+    html = $body.html();
 
     // Transforming HTML into JSX
     let jsx = htmltojsx.convert(html).trim()
