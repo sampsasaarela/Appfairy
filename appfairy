@@ -19,7 +19,7 @@ let {
   version,
 } = minimist(process.argv.slice(2), {
   string: ['output', 'input', 'source', 'config'],
-  boolean: ['prefetch', 'help'],
+  boolean: ['prefetch', 'help', 'doNotComposeStyleImports', 'doNotComposeScriptsInvocations'],
   alias: {
     in: 'input',
     out: 'output',
@@ -32,6 +32,8 @@ let {
     input: `${root}/.appfairy`,
     output: root,
     source: '',
+    doNotComposeScriptsInvocations: false,
+    doNotComposeStyleImports: false,
   },
 })
 

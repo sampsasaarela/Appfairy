@@ -281,6 +281,8 @@ class ViewWriter extends Writer {
     this.name = options.name
     this.html = options.html
     this.source = options.source
+    this.doNotComposeScriptsInvocations = options.doNotComposeScriptsInvocations;
+    this.doNotComposeStyleImports = options.doNotComposeStyleImports;
   }
 
   async write(dir, ctrlsDir) {
@@ -381,6 +383,10 @@ class ViewWriter extends Writer {
   }
 
   _composeStyleImports() {
+    if (this.doNotComposeStyleImports) {
+      return '';
+    }
+
     const hrefs = this[_].styles.map(({ type, body }) => {
       return type == 'href' && body
     }).filter(Boolean)
@@ -436,7 +442,7 @@ class ViewWriter extends Writer {
   }
 
   _composeScriptsInvocations() {
-    if (!this[_].scripts) return ''
+    if (!this[_].scripts || this.doNotComposeScriptsInvocations) return ''
 
     const invoke = freeScope('eval(arguments[0])', 'window', {
       'script': null,

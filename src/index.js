@@ -85,6 +85,8 @@ const transpileHTMLFile = async (
     name: htmlFile.split('.').slice(0, -1).join('.'),
     baseUrl: config.baseUrl,
     source: config.source,
+    doNotComposeScriptsInvocations: config.doNotComposeScriptsInvocations,
+    doNotComposeStyleImports: config.doNotComposeStyleImports,
   })
 
   setScripts(scriptWriter, $head, $)
