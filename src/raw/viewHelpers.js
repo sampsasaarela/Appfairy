@@ -2,7 +2,7 @@
 
 const React = require('react')
 
-exports.transformProxies = (children = []) => {
+export const transformProxies = (children = []) => {
   children = [].concat(children).filter(Boolean)
 
   const proxies = {}
@@ -32,13 +32,13 @@ exports.transformProxies = (children = []) => {
   return proxies
 }
 
-exports.createScope = (children, callback) => {
-  const proxies = exports.transformProxies(children)
+export const createScope = (children, callback) => {
+  const proxies = transformProxies(children)
 
   return callback(proxies)
 }
 
-exports.map = (props, callback) => {
+export const map = (props, callback) => {
   if (props == null) return null
   if (!(props instanceof Array)) return callback(props)
 
