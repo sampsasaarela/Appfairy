@@ -18,7 +18,15 @@ export const transpile = async (config) => {
     }),
   ])
 
-  const htmlFiles = inputFiles.filter(file => path.extname(file) == '.html')
+  const htmlFiles = inputFiles.filter(file => (
+      path.extname(file) == '.html'
+      && (
+        !config.htmlFilePattern
+        || config.htmlFilePattern === ''
+        || path.basename(file).match(new RegExp(config.htmlFilePattern))
+      )
+    )
+  )
   const publicSubDirs = inputFiles.filter(file => !path.extname(file))
 
   const scriptWriter = new ScriptWriter({

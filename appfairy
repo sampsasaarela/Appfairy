@@ -18,7 +18,7 @@ let {
   help,
   version,
 } = minimist(process.argv.slice(2), {
-  string: ['output', 'input', 'source', 'config'],
+  string: ['output', 'input', 'source', 'config', 'htmlFilePattern'],
   boolean: ['prefetch', 'help', 'doNotComposeStyleImports', 'doNotComposeScriptsInvocations'],
   alias: {
     in: 'input',
@@ -34,6 +34,7 @@ let {
     source: '',
     doNotComposeScriptsInvocations: false,
     doNotComposeStyleImports: false,
+    htmlFilePattern: '',
   },
 })
 
