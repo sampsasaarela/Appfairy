@@ -79,10 +79,10 @@ class ViewWriter extends Writer {
                 ==>${socketTypes}<==
             }
         }
-    }\n
+    }
     `);
 
-    await fs.writeFile(typeFile, types);
+    await fs.writeFile(typeFile, `${types}\n`);
 
     childFilePaths.push(typeFile)
 
