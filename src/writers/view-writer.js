@@ -84,6 +84,8 @@ class ViewWriter extends Writer {
 
     await fs.writeFile(typeFile, types);
 
+    childFilePaths.push(typeFile)
+
     return childFilePaths
   }
 
