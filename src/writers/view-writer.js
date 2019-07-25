@@ -39,11 +39,14 @@ class ViewWriter extends Writer {
     const indexFilePath = `${dir}/index.js`
     const helpersFilePath = `${dir}/helpers.js`
     const childFilePaths = [indexFilePath, helpersFilePath]
+    const typeFile = `${ctrlsDir}/d.ts`;
     ctrlsDir = path.relative(dir, ctrlsDir)
     viewWriters = flattenChildren(viewWriters)
 
+    const allSockets = [];
     const writingViews = viewWriters.map(async (viewWriter) => {
       const filePaths = await viewWriter.write(dir, ctrlsDir)
+      allSockets.push(...viewWriter.sockets);
       childFilePaths.push(...filePaths)
     })
 
@@ -59,6 +62,27 @@ class ViewWriter extends Writer {
       writingIndex,
       writingHelpers,
     ])
+
+    const socketTypes = allSockets ? allSockets
+      .filter((x, i, a) => a.indexOf(x) == i)
+      .map(socket => `'${socket}': BaseType;`)
+      .join('\n') : '';
+
+    const types = freeLint(`
+    import React from 'react';
+
+    type BaseType = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+
+    declare global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ==>${socketTypes}<==
+            }
+        }
+    }\n
+    `);
+
+    await fs.writeFile(typeFile, types);
 
     return childFilePaths
   }
