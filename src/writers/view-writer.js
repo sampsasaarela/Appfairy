@@ -42,11 +42,17 @@ class ViewWriter extends Writer {
     const typeFile = `${ctrlsDir}/d.ts`;
     ctrlsDir = path.relative(dir, ctrlsDir)
     viewWriters = flattenChildren(viewWriters)
-
+    const map = new Map();
     const allSockets = [];
     const writingViews = viewWriters.map(async (viewWriter) => {
       const filePaths = await viewWriter.write(dir, ctrlsDir)
-      allSockets.push(...viewWriter.sockets);
+      allSockets.push(...viewWriter.sockets.filter(({ socketName }) => {
+          if(map.has(socketName)) {
+            return false;
+          }
+          map.set(socketName, true);
+          return true;
+      }));
       childFilePaths.push(...filePaths)
     })
 
@@ -64,14 +70,11 @@ class ViewWriter extends Writer {
     ])
 
     const socketTypes = allSockets ? allSockets
-      .filter((x, i, a) => a.indexOf(x) == i)
-      .map(socket => `'${socket}': BaseType;`)
+      .map(socket => `'${socket.socketName}': ${socket.socketType};`)
       .join('\n') : '';
 
     const types = freeLint(`
     import React from 'react';
-
-    type BaseType = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
     declare global {
         namespace JSX {
@@ -254,7 +257,10 @@ class ViewWriter extends Writer {
     $('[af-sock]').each((i, el) => {
       const $el = $(el)
       const socketName = $el.attr('af-sock')
-      sockets.push(socketName)
+      sockets.push({
+        socketName,
+        socketType: this.baseType,
+      })
 
       $el.attr('af-sock', null)
       // Workaround would help identify the closing tag
@@ -311,6 +317,7 @@ class ViewWriter extends Writer {
     this.source = options.source
     this.doNotComposeScriptsInvocations = options.doNotComposeScriptsInvocations;
     this.doNotComposeStyleImports = options.doNotComposeStyleImports;
+    this.baseType = options.baseType;
   }
 
   async write(dir, ctrlsDir) {
@@ -439,8 +446,8 @@ class ViewWriter extends Writer {
   }
 
   _composeProxiesDefault() {
-    return this[_].sockets.map((socket) => {
-      return `'${socket}': [],`
+    return this[_].sockets.map(({ socketName }) => {
+      return `'${socketName}': [],`
     }).join('\n')
   }
 

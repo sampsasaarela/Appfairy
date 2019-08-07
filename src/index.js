@@ -95,6 +95,7 @@ const transpileHTMLFile = async (
     source: config.source,
     doNotComposeScriptsInvocations: config.doNotComposeScriptsInvocations,
     doNotComposeStyleImports: config.doNotComposeStyleImports,
+    baseType: config.baseType,
   })
 
   setScripts(scriptWriter, $head, $)
