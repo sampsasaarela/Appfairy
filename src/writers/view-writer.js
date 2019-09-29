@@ -512,9 +512,9 @@ function bindJSX(jsx, children = []) {
     ) => (
       // If there are nested sockets
       /<[\w_-]+-af-sock-[\w_-]+/.test(children) ? (
-        `{map(proxies['${sock}'], props => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => <React.Fragment>${bindJSX(children)}</React.Fragment>)}</${el}>)}`
+        `{map(proxies['${sock}'], ({ loader, ...props }) => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => loader || <React.Fragment>${bindJSX(children)}</React.Fragment>)}</${el}>)}`
       ) : (
-        `{map(proxies['${sock}'], props => <${el} ${mergeProps(attrs)}>{props.children ? props.children : <React.Fragment>${children}</React.Fragment>}</${el}>)}`
+        `{map(proxies['${sock}'], ({ loader, ...props }) => <${el} ${mergeProps(attrs)}>{loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}</${el}>)}`
       )
     ))
     // Self closing
