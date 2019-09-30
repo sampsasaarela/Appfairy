@@ -512,11 +512,11 @@ function bindJSX(jsx, children = []) {
     ) => (
       // If there are nested sockets
       /<[\w_-]+-af-sock-[\w_-]+/.test(children) ? (
-        `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => loader || <React.Fragment>${bindJSX(children)}</React.Fragment>)}{ldLoader && <div className="ld ld-ring ld-spin"></div>}</${el}>)}`
+        `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => ${allowLoader(el) ? 'loader || <React.Fragment>${bindJSX(children)}</React.Fragment>)}{ldLoader && <div className="ld ld-ring ld-spin"></div>}' : '<React.Fragment>${bindJSX(children)}</React.Fragment>'}</${el}>)}`
       ) : (
         `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>
-          {loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}
-          {ldLoader && <div className="ld ld-ring ld-spin"></div>}
+        ${allowLoader(el) ? '{loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}{ldLoader && <div className="ld ld-ring ld-spin"></div>}'
+        : '(props.children ? props.children : <React.Fragment>${children}</React.Fragment>)'}
         </${el}>)}`
       )
     ))
@@ -525,8 +525,14 @@ function bindJSX(jsx, children = []) {
       /<([\w_-]+)-af-sock-([\w_-]+)(.*?) \/>/g, (
       match, el, sock, attrs
     ) => (
-      `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>{loader || props.children}{ldLoader && <div className="ld ld-ring ld-spin"></div>}</${el}>)}`
+      `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>${allowLoader(el) ? '{loader || props.children}{ldLoader && <div className="ld ld-ring ld-spin"></div>}' : '{props.children}'}</${el}>)}`
     ))
+}
+
+function allowLoader(tag) {
+  const disallowedLoaderTags = ['input', 'select', 'option'];
+
+  !disallowedLoaderTags.includes(tag.toLowerCase());
 }
 
 // Merge props along with class name
