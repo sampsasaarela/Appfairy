@@ -517,7 +517,7 @@ function bindJSX(jsx, children = []) {
         `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => (
           <${el} ${mergeProps(attrs)}>
             {createScope(props.children, proxies => ${allowLoader(el)
-            ? `{loader || <React.Fragment>${bindJSX(children)}${ldLoader}</React.Fragment>}`
+            ? `loader || <React.Fragment>${bindJSX(children)}${ldLoader}</React.Fragment>`
             : `<React.Fragment>${bindJSX(children)}</React.Fragment>`})}
           </${el}>
         ))}`
