@@ -512,9 +512,12 @@ function bindJSX(jsx, children = []) {
     ) => (
       // If there are nested sockets
       /<[\w_-]+-af-sock-[\w_-]+/.test(children) ? (
-        `{map(proxies['${sock}'], ({ 'data-loader': loader, ...props }) => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => loader || <React.Fragment>${bindJSX(children)}</React.Fragment>)}</${el}>)}`
+        `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>{createScope(props.children, proxies => loader || <React.Fragment>${bindJSX(children)}</React.Fragment>)}{ldLoader && <div className="ld ld-ring ld-spin"></div>}</${el}>)}`
       ) : (
-        `{map(proxies['${sock}'], ({ 'data-loader': loader, ...props }) => <${el} ${mergeProps(attrs)}>{loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}</${el}>)}`
+        `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>
+          {loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}
+          {ldLoader && <div className="ld ld-ring ld-spin"></div>}
+        </${el}>)}`
       )
     ))
     // Self closing
@@ -522,7 +525,7 @@ function bindJSX(jsx, children = []) {
       /<([\w_-]+)-af-sock-([\w_-]+)(.*?) \/>/g, (
       match, el, sock, attrs
     ) => (
-      `{map(proxies['${sock}'], props => <${el} ${mergeProps(attrs)}>{props.children}</${el}>)}`
+      `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => <${el} ${mergeProps(attrs)}>{loader || props.children}{ldLoader && <div className="ld ld-ring ld-spin"></div>}</${el}>)}`
     ))
 }
 
@@ -543,7 +546,7 @@ function mergeProps(attrs) {
   className = className[1]
   attrs = attrs.replace(/ ?className="[^"]+"/, '')
 
-  return `${attrs} {...{...props, className: \`${className} $\{props.className || ''}\`}}`.trim()
+  return `${attrs} {...{...props, className: \`${className} $\{ldLoader || ''} $\{props.className || ''}\`}}`.trim()
 }
 
 export default ViewWriter
