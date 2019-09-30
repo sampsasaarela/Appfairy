@@ -515,19 +515,19 @@ function bindJSX(jsx, children = []) {
       // If there are nested sockets
       /<[\w_-]+-af-sock-[\w_-]+/.test(children) ? (
         `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => (
-          <${el} ${mergeProps(attrs)}>
-            {createScope(props.children, proxies => ${allowLoader(el)
+          <${transformEl(el, attrs)} ${mergeProps(attrs)}>
+            {createScope(props.children, proxies => ${allowLoader(el, attrs)
             ? `loader || <React.Fragment>${bindJSX(children)}${ldLoader}</React.Fragment>`
             : `<React.Fragment>${bindJSX(children)}</React.Fragment>`})}
-          </${el}>
+          </${transformEl(el, attrs)}>
         ))}`
       ) : (
         `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => (
-          <${el} ${mergeProps(attrs)}>
-            ${allowLoader(el)
+          <${transformEl(el, attrs)} ${mergeProps(attrs)}>
+            ${allowLoader(el, attrs)
               ? `{loader || (props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}${ldLoader}`
               : `{(props.children ? props.children : <React.Fragment>${children}</React.Fragment>)}`}
-          </${el}>
+          </${transformEl(el, attrs)}>
         ))}`
       )
     ))
@@ -537,18 +537,35 @@ function bindJSX(jsx, children = []) {
       match, el, sock, attrs
     ) => (
       `{map(proxies['${sock}'], ({ 'data-loader': loader, 'data-ld-loader': ldLoader, ...props }) => (
-          <${el} ${mergeProps(attrs)}>${allowLoader(el)
-        ? `{loader || props.children}${ldLoader}`
-        : '{props.children}'}
-          </${el}>
+          <${transformEl(el, attrs)} ${mergeProps(attrs)}>${allowLoader(el, attrs)
+        ? `{loader || ${transformChildren(el, attrs)}}${ldLoader}`
+        : `{${transformChildren(el, attrs)}}`}
+          </${transformEl(el, attrs)}>
         ))}`
     ))
 }
 
-function allowLoader(tag) {
+function allowLoader(el, attrs) {
   const disallowedLoaderTags = ['input', 'select', 'option'];
 
-  return !disallowedLoaderTags.includes(tag.toLowerCase());
+  return !disallowedLoaderTags.includes(transformEl(el, attrs).toLowerCase());
+}
+
+function transformChildren(el, attrs) {
+  let value;
+  if (el === 'input' && attrs && attrs.match(/type="submit"/) && (value = attrs.match(/value="([^"]+)"/))) {
+    return `(props.children ? props.children : '${value[1].replace(/'/, '\'')}')`;
+  }
+
+  return 'props.children';
+}
+
+function transformEl(el, attrs) {
+  if (el === 'input' && attrs && attrs.match(/type="submit"/)) {
+    return 'button';
+  }
+
+  return el;
 }
 
 // Merge props along with class name
