@@ -115,6 +115,11 @@ const makePublicDir = async (config, publicSubDirs) => {
     )
   }))
 
+  const webflowJsFile = `${publicDir}/js/webflow.js`;
+  const webflowJs = await fs.readFile(webflowJsFile, 'utf8');
+  webflowJs.replace(/window\.alert/g, 'function(){}');
+  await fs.writeFile(webflowJsFile, webflowJs.replace(/window\.alert/g, 'function(){}'), 'utf8');
+
   // Resolving relative paths
   const filePaths = await reread(config.input)
 
