@@ -546,7 +546,7 @@ function bindJSX(jsx, children = []) {
 }
 
 function allowLoader(el, attrs) {
-  const disallowedLoaderTags = ['input', 'select', 'option'];
+  const disallowedLoaderTags = ['input', 'select', 'option', 'img'];
 
   return !disallowedLoaderTags.includes(transformEl(el, attrs).toLowerCase());
 }
