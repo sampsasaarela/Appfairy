@@ -2,7 +2,7 @@ import cheerio from 'cheerio'
 import HTMLtoJSX from 'htmltojsx'
 import path from 'path'
 import statuses from 'statuses'
-import uglify from 'uglify-js'
+// import uglify from 'uglify-js'
 import { fs, mkdirp } from '../libs'
 import raw from '../raw'
 import Writer from './writer'
@@ -463,17 +463,18 @@ class ViewWriter extends Writer {
   }
 
   _composeScriptsDeclerations() {
-    return this[_].scripts.map((script) => {
-      if (script.type == 'src') {
-        return `fetch("${script.body}").then(body => body.text()),`
-      }
-
-      const minified = uglify.minify(script.body).code
-      // Unknown script format ??? fallback to maxified version
-      const code = minified || script.body
-
-      return `Promise.resolve("${escape(code)}"),`
-    }).join('\n')
+    return '';
+    // return this[_].scripts.map((script) => {
+    //   if (script.type == 'src') {
+    //     return `fetch("${script.body}").then(body => body.text()),`
+    //   }
+    //
+    //   const minified = uglify.minify(script.body).code
+    //   // Unknown script format ??? fallback to maxified version
+    //   const code = minified || script.body
+    //
+    //   return `Promise.resolve("${escape(code)}"),`
+    // }).join('\n')
   }
 
   _composeScriptsInvocations() {
